@@ -7,7 +7,7 @@ import os
 import subprocess
 
 NODE_TYPES = [ 'small', 'medium', 'large' ]
-ARCHITECTURES = [ 'x86_64', 'aarch64', 'power' ]
+ARCHITECTURES = [ 'x86_64', 'aarch64', 'ppc64le' ]
 TERRAFORM_COMMANDS = [ 'plan', 'apply', 'destroy' ]
 TF_ENV_PREFIX = 'TF_VAR'
 ROOT_DIRECTORY = os.path.dirname(os.path.realpath(__file__))
