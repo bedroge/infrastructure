@@ -45,6 +45,10 @@ variable "create_aarch64" {
   default = false
 }
 
+variable "create_ppc64le" {
+  default = false
+}
+
 variable "instance_aarch64" {
   type = map
 
@@ -62,5 +66,15 @@ variable "instance_x86_64" {
     small = "t2.micro"
     medium = "c5.xlarge"
     large = "c5.4xlarge"
+  }
+}
+
+variable "instance_ppc64le" {
+  type = map
+
+  default = {
+    small = "p9.small"
+    medium = "p9.medium"
+    large = "p9.xlarge"
   }
 }
