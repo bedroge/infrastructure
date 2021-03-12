@@ -14,6 +14,17 @@ from eessi.tools import destroy_infrastructure
 # TODO:
 # Create throw-away ssh keys?
 
+REQUIRED_ENVIRONMENT_KEYS = [
+    'AWS_SECRET_ACCESS_KEY',
+    'AWS_ACCESS_KEY_ID',
+    'OS_AUTH_URL',
+    'OS_USERNAME',
+    'OS_PASSWORD',
+    'OS_USER_DOMAIN_NAME',
+#    'OS_PROJECT_ID',
+#    'OS_PROJECT_NAME',
+]
+
 def required_environment_keys_are_set(keys):
     """
     Check that the given environment keys are set.
@@ -57,7 +68,7 @@ def main():
                         action='store_const', const=True, help='Destroy infrastructure.')
     args = parser.parse_args()
 
-    if not required_environment_keys_are_set(['AWS_SECRET_ACCESS_KEY', 'AWS_ACCESS_KEY_ID']):
+    if not required_environment_keys_are_set(REQUIRED_ENVIRONMENT_KEYS):
         parser.print_help()
         sys.exit(1)
 
