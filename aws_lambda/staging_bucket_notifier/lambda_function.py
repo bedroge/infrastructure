@@ -1,3 +1,4 @@
+import boto3
 import json
 import logging
 import os
@@ -9,6 +10,8 @@ OBJECT_TYPE = os.environ.get('OBJECT_TYPE', 'File')
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
+
+iam = boto3.client('iam')
 
 def human_size(bytes, units=[' bytes','KB','MB','GB','TB', 'PB', 'EB']):
     """ Returns a human readable string representation of bytes """
@@ -27,6 +30,12 @@ def lambda_handler(event, context):
     object_url = 'https://' + bucket + '.s3.amazonaws.com/' + object_key
     object_source = event['Records'][0]['requestParameters']['sourceIPAddress']
     event_time = event['Records'][0]['eventTime']
+    event_principal_id = event['Records'][0]['userIdentity']['principalId'].split(':')[-1]
+    id2user = list(filter(lambda user: user['UserId'] == event_principal_id, iam.list_users()['Users']))
+    if len(id2user) > 0:
+        event_username = id2user[0]['UserName']
+    else:
+        event_username = 'unknown user'
 
     action, reason = event['Records'][0]['eventName'].split(':')
 
@@ -36,8 +45,7 @@ def lambda_handler(event, context):
         attachment_title = f'New {object_type.lower()} uploaded! :tada:'
         message_title = f'{object_type} uploaded to bucket "{bucket}"'
         message_level = 'good'
-        message = f'{object_key} has been uploaded to bucket on {event_time}\n file size: {object_size}\n URL: {object_url}\n source: {object_source}'
-
+        message = f'{object_key} has been uploaded to bucket\non: {event_time}\n by: {event_username}\n file size: {object_size}\n URL: {object_url}\n source: {object_source}'
     elif action == 'ObjectRemoved':
         # Deleted an existing file
         if reason == 'Delete':
@@ -49,7 +57,7 @@ def lambda_handler(event, context):
 
         message_title = f'{object_type} deleted from bucket "{bucket}"'
         message_level = 'warning'
-        message = f'{object_key} has been deleted from bucket on {event_time}\n URL: {object_url}\n reason: {reason}'
+        message = f'{object_key} has been deleted from bucket\non: {event_time}\nby: {event_username}\n URL: {object_url}\n reason: {reason}'
 
     logger.info("Message: " + str(message))
 
