@@ -6,6 +6,7 @@ This Lambda function sends Slack notification whenever a file is being uploaded 
 
 - Create a new Slack App, and set up an Incoming Webhook that allows the Lambda function to post messages to a certain channel.
 - Create a new AWS Lambda function from scratch, and select Python 3.8 as runtime.
+- AWS should automatically create an IAM role for your Lambda function, but in order to search the username of the uploader, you also need to attach an `IAMReadOnlyAccess` policy to this role.
 - Add the code from the file `lambda_function.py` to your new Lambda function, and hit `Deploy`.
 - Go the Configuration page of your Lambda function, add an environment variable `SLACK_WEBHOOK_URL`, and set it to the URL obtained in the first step.
 - Optionally, make an environment variable `OBJECT_TYPE` that has the name of the type of files that you are going to use, e.g. `Tarball`. This will be used in the messages. The default is `File`.
