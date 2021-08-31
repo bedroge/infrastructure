@@ -7,6 +7,7 @@ import urllib3
 # Read all the environment variables
 SLACK_WEBHOOK_URL = os.environ['SLACK_WEBHOOK_URL']
 OBJECT_TYPE = os.environ.get('OBJECT_TYPE', 'File')
+METADATA_FILE_EXTENSION = '.meta.txt'
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -29,6 +30,13 @@ def lambda_handler(event, context):
     object_key = event['Records'][0]['s3']['object']['key']
     object_url = 'https://' + bucket + '.s3.amazonaws.com/' + object_key
     object_source = event['Records'][0]['requestParameters']['sourceIPAddress']
+
+    # If this was a metadata file, ignore it.
+    if object_key.endswith(METADATA_FILE_EXTENSION):
+        logger.info("Ignoring metadata file " + object_key)
+        return
+
+    # Find more information about the event
     event_time = event['Records'][0]['eventTime']
     event_principal_id = event['Records'][0]['userIdentity']['principalId'].split(':')[-1]
     id2user = list(filter(lambda user: user['UserId'] == event_principal_id, iam.list_users()['Users']))
